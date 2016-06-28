@@ -11,12 +11,12 @@ package seismicscala
 // http://blog.scalac.io/2015/05/21/dynamic-member-lookup-in-scala.html
 
 import scala.language.dynamics
-import scala.sys.process.stringSeqToProcess
+import scala.sys.process.{stringSeqToProcess,ProcessBuilder}
 
-case class SuProcess(_in: String = "",
-                     _out: String = "",
-                     _append: Boolean = false,
-                     proc: List[Seq[String]] = Nil) extends Dynamic {
+case class Command(_in: String = "",
+                   _out: String = "",
+                   _append: Boolean = false,
+                   proc: List[Seq[String]] = Nil) extends Dynamic {
 
   private[this] def param(key: Any, value: Any): Seq[String] = {
     if (key.toString.isEmpty) {
@@ -38,40 +38,38 @@ case class SuProcess(_in: String = "",
       }
       Seq(s"$key=$v")
     }
-
   }
 
-  def applyDynamicNamed(name: String)(values: (String, Any)*): SuProcess = {
-    val command = name
+  def applyDynamicNamed(name: String)(values: (String, Any)*): Command = {
     val params = values.map { case (a, b) => param(a, b) }.flatten
-    copy(proc = { Seq(command) ++ params } :: proc)
+    copy(proc = { Seq(name) ++ params } :: proc)
   }
 
-  def applyDynamic(name: String)(value: Any): SuProcess = {
+  def applyDynamic(name: String)(value: Any): Command = {
     copy(proc = { Seq(name, value.toString) } :: proc)
   }
 
-  def selectDynamic(name: String): SuProcess = {
+  def selectDynamic(name: String): Command = {
     copy(proc = Seq(name) :: proc)
   }
 
-  def in(file: String): SuProcess = copy(_in = file)
-  def <(file: String): SuProcess = in(file)
-  def out(file: String): SuProcess = copy(_out = file, _append = false)
-  def >(file: String): SuProcess = out(file)
+  def in(file: String): Command = copy(_in = file)
+  def <(file: String): Command = in(file)
+  def out(file: String): Command = copy(_out = file, _append = false)
+  def >(file: String): Command = out(file)
   def append(file: String) = copy(_out = file, _append = true)
   def >>(file: String) = append(file)
   def exec: String = build.!!
   def ! : String = exec
   def run: Unit = build.run
   def & : Unit = run
-  def |(process: SuProcess) = {
-    val in = if (process._in.nonEmpty) process._in else _in
-    val out = if (process._out.nonEmpty) process._out else _out
-    val append = if (process._out.nonEmpty) process._append else _append
-    copy(proc = process.proc ++ proc, _in = in, _out = out, _append = append)
+  def |(command: Command) = {
+    val in = if (command._in.nonEmpty) command._in else _in
+    val out = if (command._out.nonEmpty) command._out else _out
+    val append = if (command._out.nonEmpty) command._append else _append
+    copy(proc = command.proc ++ proc, _in = in, _out = out, _append = append)
   }
-  
+
   override def toString(): String = {
     val p = proc.reverse.map { x => x.mkString(" ") }.mkString(" | ")
     val p_in = if (_in.isEmpty()) p else (p + " < " + _in)
@@ -84,7 +82,7 @@ case class SuProcess(_in: String = "",
     p_in_out
   }
 
-  private def build = {
+  private def build(): ProcessBuilder = {
     import scala.sys.process._
     val p = proc.reverse.foldLeft(Process(true))((a, b) => a #| b)
     val p_in = if (_in.isEmpty()) p else (p #< new java.io.File(_in))
@@ -97,7 +95,7 @@ case class SuProcess(_in: String = "",
   }
 }
 
-object SuProcess {
-  def apply(): SuProcess = SuProcess("", "")
-  def $ = SuProcess("", "")
+object Command {
+  def apply(): Command = Command("", "")
+  def $ = Command("", "")
 }

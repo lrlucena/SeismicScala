@@ -1,6 +1,6 @@
 package samples
 
-import seismicscala.SuProcess._
+import seismicscala.Command._
 
 object Dinamico extends App {
   val data = "./"

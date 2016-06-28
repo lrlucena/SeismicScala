@@ -1,6 +1,6 @@
 package samples
 
-import seismicscala.SuProcess._
+import seismicscala.Command._
 object PostSDM extends App {
   val data = "../act3/"
   val inputdata = "${data}zosection_10.su"

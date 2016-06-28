@@ -2,7 +2,7 @@ package samples
 
 object Geom extends App {
 
-  import seismicscala.SuProcess._
+  import seismicscala.Command._
 
   val inputdata = "cshots.su"
   val outputdata = "cshotsGeom.su"

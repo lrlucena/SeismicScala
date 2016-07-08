@@ -16,7 +16,7 @@ Is equivalent to
 ````sh
 #!/bin/sh
 
-suplane | suxwigb !
+suplane | suxwigb &
 ````
 
 

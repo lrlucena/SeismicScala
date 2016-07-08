@@ -23,8 +23,8 @@ import seismicscala.Command._
 ($ > "junk.su").suplane.!
 
 val image = $ < "junk.su"
-params = Map("title" -> "Suplane test pattern", "label1" -> "time (s)", "label2" -> "trace number"
+params = Map("title" -> "Suplane test pattern", "label1" -> "time (s)", "label2" -> "trace number")
 
-image.suxigb(params).&
+image.suxwigb(params).&
 (image > "suplane.eps").supswigb(params).&
 ````

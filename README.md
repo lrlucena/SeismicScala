@@ -64,6 +64,6 @@ Is equivalent to
 
 suplane > junk.su
 
-suxwigb < 'junk.su' title='Suplane test pattern' label1='time (s)' label2='trace number' 
+suxwigb < 'junk.su' title='Suplane test pattern' label1='time (s)' label2='trace number' &
 supswigb < 'junk.su' > 'suplane.eps' title='Suplane test pattern' label1='time (s)' label2='trace number'
 ````
